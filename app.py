@@ -89,3 +89,33 @@ selected_po = st.selectbox(
     "Select Purchase Order",
     filtered_df["PO ID"]
 )
+selected_row = filtered_df[
+    filtered_df["PO ID"] == selected_po
+].iloc[0]
+st.write("### 📄 Purchase Order Information")
+
+st.write(f"**PO ID:** {selected_row['PO ID']}")
+st.write(f"**Supplier:** {selected_row['Supplier']}")
+st.write(f"**Material:** {selected_row['Material']}")
+st.write(f"**Material ID:** {selected_row['Material ID']}")
+st.write(f"**Quantity:** {selected_row['Quantity']}")
+st.write(f"**Amount:** ₹{selected_row['Amount (₹)']:,}")
+st.write(f"**Status:** {selected_row['Status']}")
+st.write(f"**Priority:** {selected_row['Priority']}")
+st.markdown("---")
+st.subheader("🤖 AI Recommendation")
+amount = selected_row["Amount (₹)"]
+priority = selected_row["Priority"]
+if priority == "High" and amount > 1000000:
+    recommendation = "🚨 Escalate"
+    reason = "High priority purchase order with value greater than ₹10,00,000."
+
+elif priority == "Medium":
+    recommendation = "⚠️ Review"
+    reason = "Medium priority purchase order requires managerial review."
+
+else:
+    recommendation = "✅ Approve"
+    reason = "Low-risk purchase order suitable for approval."
+    st.success(f"### Recommendation: {recommendation}")
+st.info(f"Reason: {reason}")
