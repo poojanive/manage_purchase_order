@@ -108,41 +108,93 @@ if len(filtered_df) > 0:
     st.write(f"**Priority:** {selected_row['Priority']}")
 
     st.markdown("---")
-    st.subheader("🤖 AI Procurement Recommendation")
+   # -------------------------------
+# Procurement Risk Analysis
+# -------------------------------
+st.markdown("---")
+st.subheader("🤖 AI Procurement Risk Analysis")
 
-    amount = selected_row["Amount (₹)"]
-    priority_value = selected_row["Priority"]
+amount = selected_row["Amount (₹)"]
+priority_value = selected_row["Priority"]
+status_value = selected_row["Status"]
 
-    if priority_value == "High" and amount > 1000000:
-        recommendation = "🚨 Escalate"
-        reason = "High priority purchase order with value greater than ₹10,00,000."
+risk_factors = []
 
-    elif priority_value == "Medium":
-        recommendation = "⚠️ Review"
-        reason = "Medium priority purchase order requires managerial review."
+# Check priority
+if priority_value == "High":
+    risk_factors.append("High priority purchase order")
 
-    else:
-        recommendation = "✅ Approve"
-        reason = "Low-risk purchase order suitable for approval."
+# Check order value
+if amount > 1000000:
+    risk_factors.append("High procurement value")
 
-    st.success(f"### Recommendation: {recommendation}")
-    st.info(f"**Reason:** {reason}")
+# Check status
+if status_value == "Pending":
+    risk_factors.append("Purchase order is still pending")
+
+# Generate recommendation
+if len(risk_factors) >= 2:
+    recommendation = "🚨 Escalate"
+    risk_level = "High Risk"
+
+elif len(risk_factors) == 1:
+    recommendation = "⚠️ Review"
+    risk_level = "Medium Risk"
 
 else:
-    st.warning("No Purchase Orders match the selected filters.")
-    st.markdown("---")
+    recommendation = "✅ Approve"
+    risk_level = "Low Risk"
+
+# Display recommendation
+st.success(f"### Recommendation: {recommendation}")
+
+st.write(f"**Risk Level:** {risk_level}")
+
+# Display factors
+st.write("### 🔎 Decision Factors")
+
+for factor in risk_factors:
+    st.write(f"• {factor}")
+
+if not risk_factors:
+    st.write("• No major risk factors identified.")
+
+# Explain the decision
+st.info(
+    "The recommendation is generated using the selected "
+    "purchase order's priority, procurement value and status."
+)
+# -------------------------------
+# Purchase Order Actions
+# -------------------------------
+st.markdown("---")
 st.subheader("⚡ Purchase Order Actions")
 
 action1, action2, action3 = st.columns(3)
 
 with action1:
-    if st.button("✅ Approve Purchase Order", use_container_width=True):
-        st.success(f"{selected_po} has been approved successfully.")
+    if st.button(
+        "✅ Approve Purchase Order",
+        use_container_width=True
+    ):
+        st.success(
+            f"{selected_po} has been approved successfully."
+        )
 
 with action2:
-    if st.button("❌ Reject Purchase Order", use_container_width=True):
-        st.error(f"{selected_po} has been rejected.")
+    if st.button(
+        "❌ Reject Purchase Order",
+        use_container_width=True
+    ):
+        st.error(
+            f"{selected_po} has been rejected."
+        )
 
 with action3:
-    if st.button("🚨 Escalate Purchase Order", use_container_width=True):
-        st.warning(f"{selected_po} has been escalated to the Procurement Head.")
+    if st.button(
+        "🚨 Escalate Purchase Order",
+        use_container_width=True
+    ):
+        st.warning(
+            f"{selected_po} has been escalated to the Procurement Head."
+        )
