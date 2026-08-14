@@ -130,3 +130,19 @@ if len(filtered_df) > 0:
 
 else:
     st.warning("No Purchase Orders match the selected filters.")
+    st.markdown("---")
+st.subheader("⚡ Purchase Order Actions")
+
+action1, action2, action3 = st.columns(3)
+
+with action1:
+    if st.button("✅ Approve Purchase Order", use_container_width=True):
+        st.success(f"{selected_po} has been approved successfully.")
+
+with action2:
+    if st.button("❌ Reject Purchase Order", use_container_width=True):
+        st.error(f"{selected_po} has been rejected.")
+
+with action3:
+    if st.button("🚨 Escalate Purchase Order", use_container_width=True):
+        st.warning(f"{selected_po} has been escalated to the Procurement Head.")
