@@ -198,3 +198,131 @@ with action3:
         st.warning(
             f"{selected_po} has been escalated to the Procurement Head."
         )
+        # -------------------------------
+# Procurement Exception Monitor
+# -------------------------------
+st.markdown("---")
+st.subheader("🚨 Procurement Exception Monitor")
+
+exception_df = df[
+    (df["Status"] == "Pending") |
+    (df["Priority"] == "High")
+].copy()
+
+exception_df["Risk"] = exception_df.apply(
+    lambda row:
+        "High"
+        if row["Status"] == "Pending" and row["Priority"] == "High"
+        else "Medium",
+    axis=1
+)
+
+exception_df["Recommended Action"] = exception_df.apply(
+    lambda row:
+        "Escalate immediately"
+        if row["Risk"] == "High"
+        else "Review and follow up",
+    axis=1
+)
+
+st.dataframe(
+    exception_df[
+        [
+            "PO ID",
+            "Supplier",
+            "Material",
+            "Amount (₹)",
+            "Status",
+            "Priority",
+            "Risk",
+            "Recommended Action"
+        ]
+    ],
+    use_container_width=True
+)
+# -------------------------------
+# Procurement Analytics
+# -------------------------------
+st.markdown("---")
+st.subheader("📊 Procurement Analytics")
+
+total_pos = len(df)
+
+pending_pos = len(
+    df[df["Status"] == "Pending"]
+)
+
+high_value_pos = len(
+    df[df["Amount (₹)"] > 1000000]
+)
+
+total_value = df["Amount (₹)"].sum()
+
+analytics1, analytics2, analytics3, analytics4 = st.columns(4)
+
+analytics1.metric(
+    "Total POs",
+    total_pos
+)
+
+analytics2.metric(
+    "Pending POs",
+    pending_pos
+)
+
+analytics3.metric(
+    "High Value POs",
+    high_value_pos
+)
+
+analytics4.metric(
+    "Total Procurement Value",
+    f"₹{total_value:,.0f}"
+)
+
+
+# -------------------------------
+# Supplier Performance Analysis
+# -------------------------------
+st.markdown("---")
+st.subheader("🏢 Supplier Performance Analysis")
+
+supplier_analysis = (
+    df.groupby("Supplier")
+    .agg(
+        Purchase_Orders=("PO ID", "count"),
+        Total_Value=("Amount (₹)", "sum"),
+        Pending_Orders=(
+            "Status",
+            lambda x: (x == "Pending").sum()
+        )
+    )
+    .reset_index()
+)
+
+supplier_analysis["Risk"] = supplier_analysis.apply(
+    lambda row:
+        "High"
+        if row["Pending_Orders"] >= 1
+        else "Low",
+    axis=1
+)
+
+supplier_analysis["Recommended Action"] = supplier_analysis.apply(
+    lambda row:
+        "Follow up with supplier"
+        if row["Risk"] == "High"
+        else "Normal monitoring",
+    axis=1
+)
+
+supplier_analysis["Total_Value"] = supplier_analysis[
+    "Total_Value"
+].apply(
+    lambda x: f"₹{x:,.0f}"
+)
+
+st.dataframe(
+    supplier_analysis,
+    use_container_width=True
+)
